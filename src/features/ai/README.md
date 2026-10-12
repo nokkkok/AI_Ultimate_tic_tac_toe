@@ -68,7 +68,7 @@ IDS combines the memory efficiency of depth-first search with the completeness o
 
 **Runtime:** $O(b^d)$ per depth. Because each depth re-explores all shallower levels, IDS runs in $O(b^d)$ total — the same asymptotic cost as a single DFS to depth $d$.
 
-**Memory:** $O(d)$ — only the current path from root to leaf is on the call stack at any time. This is the key advantage over BFS.
+**Memory:** $O(bd + T)$ — each active recursive call retains up to $b$ legal moves, and the recursion stack has depth $d$. $T$ is the number of transposition-table entries, capped at 100,000.
 
 ---
 
@@ -100,9 +100,9 @@ At depth 0 (leaf nodes that are not terminal), the board position is scored usin
 
 **Optimality:** Optimal within the search depth against a rational opponent, same as blind DFS Minimax. Because Alpha-Beta reaches significantly greater depths within the time budget, it plays stronger in practice.
 
-**Runtime:** $O(b^{d/2})$ in the best case (with perfect move ordering), $O(b^d)$ worst case (with poor ordering). In practice, good move ordering achieves close to best-case performance.
+**Runtime:** $O(b^d \log b)$ in the worst case, including the $O(b \log b)$ cost of sorting moves at each expanded node. With perfect move ordering, Alpha-Beta reduces the number of searched nodes to approximately $O(b^{d/2})$.
 
-**Memory:** $O(d)$ for the call stack, plus the transposition table bounded at 100,000 entries.
+**Memory:** $O(bd + T)$ — each active recursive call retains up to $b$ ordered child states, and the recursion stack has depth $d$. $T$ is the number of transposition-table entries, capped at 100,000.
 
 ---
 
@@ -115,8 +115,8 @@ At depth 0 (leaf nodes that are not terminal), the board position is scored usin
 | **Adversarial?**    | No — optimistic (assumes no opponent resistance) | Yes — plays optimal moves for both sides   | Yes — plays optimal moves for both sides            |
 | **Optimal?**        | Shortest path to win (if opponent cooperates)    | Optimal within depth vs. rational opponent | Optimal within depth vs. rational opponent          |
 | **Effective depth** | Shallow — limited by memory and branching factor | Moderate — memory-efficient but full tree  | Deep — Alpha-Beta halves effective branching factor |
-| **Runtime**         | $O(b^d)$                                         | $O(b^d)$                                   | $O(b^{d/2})$ best case                              |
-| **Memory**          | $O(b^d)$ — entire frontier in queue              | $O(d)$ — call stack only                   | $O(d)$ — call stack + bounded TT                    |
+| **Runtime**         | $O(b^d)$                                         | $O(b^d)$                                   | $O(b^d \log b)$ worst case                              |
+| **Memory**          | $O(b^d)$ — entire frontier in queue              | $O(bd + T)$ — move lists + cache                   | $O(bd + T)$ — child states + cache                    |
 | **Time budget**     | 1000 ms per move                                 | 1000 ms per move                           | 1000 ms per move, max depth 10                      |
 | **Key weakness**    | Exponential memory; non-adversarial evaluation   | Slower at equal depth vs. Alpha-Beta       | Requires a well-tuned evaluation function           |
 
@@ -177,5 +177,5 @@ Matchup level: `wins` counts X-side wins, O-side wins, and draws; `games[]` list
 #### Memory Usage
 
 - **BFS:** Holds the entire frontier in memory simultaneously. Measured avg ~1.66 M queued states (max ~2.41 M) at depth 10, with a worst single-turn heap growth of ~679 MB — the dominant memory consumer, plus a ~90 k-entry transposition table.
-- **DFS / IDS:** Only the current path (max 10 frames, typically ~7) is on the call stack at any time. Memory is $O(d)$ — worst single-turn heap growth ~22 MB — plus a ~94 k-entry transposition table shared across IDS iterations.
-- **Heuristic:** Same $O(d)$ call stack as DFS (max 10 frames), worst single-turn heap growth ~25 MB. Within the 1000 ms budget its transposition table fills to ~60 k entries (it reached only ~12 k in earlier runs that used a 100 ms budget).
+- **DFS / IDS:** Only the current path (max 10 frames, typically ~7) is on the call stack at any time. Total auxiliary memory is $O(bd + T)$, including legal-move lists and the cache — worst single-turn heap growth ~22 MB — with a ~94 k-entry transposition table shared across IDS iterations.
+- **Heuristic:** Total auxiliary memory is $O(bd + T)$ for ordered child states, the call stack (max 10 frames), and the cache, worst single-turn heap growth ~25 MB. Within the 1000 ms budget its transposition table fills to ~60 k entries (it reached only ~12 k in earlier runs that used a 100 ms budget).
