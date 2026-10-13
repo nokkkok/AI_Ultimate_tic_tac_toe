@@ -143,4 +143,4 @@ bun --expose-gc tests/benchmark/run.ts
 | ------------------ | ------------------------------------------------------------------------------------------------- |
 | Web Application    | [ultimate-ttt.paawaa.dev](https://ultimate-ttt.paawaa.dev/)                                       |
 | GitHub Repository  | [paaw-potsawee/AI_Ultimate_tic_tac_toe](https://github.com/paaw-potsawee/AI_Ultimate_tic_tac_toe) |
-| Presentation Video | _[Add YouTube presentation link]_                                                                 |
+| Presentation Video | [youtu.be/UjTk1V3Qb2I](https://youtu.be/UjTk1V3Qb2I)                                              |
